@@ -1,21 +1,12 @@
 import fs from 'fs'
 import path from 'path'
-import matter from 'gray-matter'
-import { remark } from 'remark'
-import html from 'remark-html'
+import { serialize } from 'next-mdx-remote/serialize'
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 
-interface Article {
-  title: string,
-  date: string,
-  outline: string,
-  author: string,
-}
-
-export function getSortedPostsData() {
-  function helper(res, current: string, directory) {
-    fs.readdirSync(directory).forEach(file => {
+export async function getSortedPostsData() {
+  async function helper(res, current: string, directory) {
+    fs.readdirSync(directory).forEach(async file => {
       const absolute = path.join(directory, file);
       if (fs.statSync(absolute).isDirectory()) {
         let name = path.basename(absolute);
@@ -24,18 +15,18 @@ export function getSortedPostsData() {
         else
           helper(res, current + "/" + name, absolute);
       } else {
-        const id = path.basename(absolute).replace(/\.md$/, '')
+        const id = path.basename(absolute).replace(/\.mdx$/, '')
         const fileContents = fs.readFileSync(absolute, 'utf8')
-        const matterResult = matter(fileContents);
+        const matterResult = await serialize(fileContents, { parseFrontmatter: true });
         res.push({
           path: current === "" ? id : current + "/" + id,
-          ...(matterResult.data as Article)
+          ...matterResult.frontmatter
         })
       }
     })
   }
   let res = [];
-  helper(res, "", postsDirectory);
+  await helper(res, "", postsDirectory);
   return res.sort(({ date: a }, { date: b }) => {
     if (a < b) {
       return 1
@@ -60,10 +51,10 @@ export function getAllPostIds() {
       } else {
         let id: Array<string>;
         if (current === "") {
-          id = [path.basename(absolute).replace(/\.md$/, "")];
+          id = [path.basename(absolute).replace(/\.mdx$/, "")];
         } else {
           id = current.split(",")
-          id.push(path.basename(absolute).replace(/\.md$/, ''));
+          id.push(path.basename(absolute).replace(/\.mdx$/, ''));
         }
 
         res.push({
@@ -81,18 +72,12 @@ export function getAllPostIds() {
 
 export async function getPostData(id) {
   const fileRelativePath = id.join("/");
-  const fullPath = path.join(postsDirectory, `${fileRelativePath}.md`)
+  const fullPath = path.join(postsDirectory, `${fileRelativePath}.mdx`)
   const fileContents = fs.readFileSync(fullPath, 'utf8')
 
-  const matterResult = matter(fileContents)
-
-  const processedContent = await remark()
-    .use(html)
-    .process(matterResult.content);
-  const content = processedContent.toString();
+  const content = await serialize(fileContents, { parseFrontmatter: true });
   return {
     id,
-    content,
-    ...(matterResult.data as Article)
+    content
   }
 }
