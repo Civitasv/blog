@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { serialize } from 'next-mdx-remote/serialize'
-
+import prism from 'remark-prism'
 const postsDirectory = path.join(process.cwd(), 'posts');
 
 export async function getSortedPostsData() {
@@ -75,9 +75,15 @@ export async function getPostData(id) {
   const fullPath = path.join(postsDirectory, `${fileRelativePath}.mdx`)
   const fileContents = fs.readFileSync(fullPath, 'utf8')
 
-  const content = await serialize(fileContents, { parseFrontmatter: true });
+  const content = await serialize(
+    fileContents,
+    {
+      mdxOptions: {
+        remarkPlugins: [prism],
+      },
+      parseFrontmatter: true
+    });
   return {
-    id,
     content
   }
 }
