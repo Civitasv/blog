@@ -6,7 +6,8 @@ import Head from "next/head";
 const defaultComponents = { Test: dynamic(() => import("../../components/blog/test")) };
 
 export default function Post({ article }) {
-    let metadata = article.content.frontmatter;
+    let metadata = article.metadata;
+    let type = article.type;
     return (
         <>
             <Head>
@@ -50,7 +51,11 @@ export default function Post({ article }) {
                                 </div>
                             </div>
                         </div>
-                        <MDXRemote {...article.content} components={defaultComponents}></MDXRemote>
+                        {
+                            (type === "mdx") ?
+                                <MDXRemote {...article.content} components={defaultComponents}></MDXRemote>
+                                : <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                        }
                     </div>
                 </div>
             </div >
@@ -67,7 +72,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-    const article = await getPostData(params.id);
+    const article = await getPostData(params.id, "md");
     return {
         props: {
             article
