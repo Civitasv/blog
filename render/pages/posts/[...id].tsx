@@ -32,23 +32,23 @@ export default function Post({ article }) {
                     rel="stylesheet"
                 />
             </Head>
-            <div className="article min-h-screen bg-white w-full h-full flex justify-center">
-                <div className="md:w-3/4 w-full pt-40 pl-20 pr-20 ml-flex flex-col items-center">
-                    <div className="header"></div>
-                    <div className="article-title text-3xl font-bold">
-                        {metadata.title}
-                    </div>
-                    <div className="article-text">
-                        <div className="text-sm text-slate-500 mt-2">
-                            <span className="me-1">{metadata.date}</span>
-                            <span className="me-1">{"·"}</span>
-                            <span className="me-1">{"4min"}</span>
-                            <span className="me-1">{"·"}</span>
-                            <span>{metadata.author}</span>
+            <div className="min-h-screen bg-white w-full h-full">
+                <div className="w-full pt-40 pl-10 pr-10 flex flex-col justify-center items-center">
+                    <div className="article w-full bg-white prose prose-neutral pt-10 pb-10">
+                        <div className="header">
+                            <div className="article-title text-3xl font-bold">
+                                {metadata.title}
+                            </div>
+                            <div className="article-text">
+                                <div className="text-sm text-slate-500 mt-2">
+                                    <span className="me-1">{metadata.date}</span>
+                                    <span className="me-1">{"·"}</span>
+                                    <span className="me-1">{"4min"}</span>
+                                    <span className="me-1">{"·"}</span>
+                                    <span>{metadata.author}</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="content bg-white prose prose-neutral pt-10 pb-10">
                         <MDXRemote {...article.content} components={defaultComponents}></MDXRemote>
                     </div>
                 </div>
