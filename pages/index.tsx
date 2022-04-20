@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { getSortedPostsData } from '../lib/posts'
 import Item from '../components/article/item'
+import Search from '../components/article/search';
 
 export default function Home({ allPostsData }) {
   return (
@@ -13,6 +14,9 @@ export default function Home({ allPostsData }) {
 
       <header>
         <div className='flex flex-col justify-center items-center'>
+          <div className="tools md:w-1/2 w-full mt-5 pr-6 pl-6 flex justify-end">
+            <Search></Search>
+          </div>
           <div className="md:w-1/2 w-full mt-40">
             <div className="introduction">
               <div className="introduction-title text-4xl font-semibold">
