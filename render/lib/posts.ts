@@ -2,11 +2,14 @@ import fs from 'fs'
 import path from 'path'
 import { serialize } from 'next-mdx-remote/serialize'
 import matter from 'gray-matter'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
 import remarkPrism from 'remark-prism'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { remark } from 'remark'
-import remarkHtml from 'remark-html'
+import rehypeStringify from 'rehype-stringify'
+import remarkGfm from 'remark-gfm'
 const postsDirectory = path.join(process.cwd(), 'posts');
 
 export async function getSortedPostsData() {
@@ -23,16 +26,17 @@ export async function getSortedPostsData() {
         const basename = path.basename(absolute);
         const fileContents = fs.readFileSync(absolute, 'utf8')
 
-        let id, matterResult, frontMatter;
+        let id;
         if (basename.endsWith(".mdx")) {
           id = basename.replace(/\.mdx$/, "");
-          matterResult = await serialize(fileContents, { parseFrontmatter: true });
-          frontMatter = matterResult.frontmatter;
         } else if (basename.endsWith(".md")) {
           id = basename.replace(/\.md$/, "");
-          matterResult = matter(fileContents);
-          frontMatter = matterResult.data;
         }
+        const matterResult = matter(fileContents);
+        const frontMatter = matterResult.data;
+        const readTime = Math.ceil(matterResult.content.split(" ").length / 200) + "min";
+        frontMatter["readTime"] = readTime;
+
         res.push({
           path: current === "" ? id : current + "/" + id,
           ...frontMatter
@@ -78,7 +82,6 @@ export function getAllPostIds() {
           id = current.split(",")
           id.push(name);
         }
-
         res.push({
           params: {
             id: id
@@ -92,20 +95,39 @@ export function getAllPostIds() {
   return files;
 }
 
-export async function getPostData(id, type) {
-  console.log(id, type)
+export async function getPostData(id) {
   const fileRelativePath = id.join("/");
-  const fullPath = path.join(postsDirectory, `${fileRelativePath}.${type}`)
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-
+  const fullMdPath = path.join(postsDirectory, `${fileRelativePath}.md`)
+  const fullMdXPath = path.join(postsDirectory, `${fileRelativePath}.mdx`)
+  let fileContents, type;
+  if (fs.existsSync(fullMdPath)) {
+    fileContents = fs.readFileSync(fullMdPath, 'utf8')
+    type = "md";
+  }
+  else if (fs.existsSync(fullMdXPath)) {
+    fileContents = fs.readFileSync(fullMdXPath, 'utf8');
+    type = "mdx";
+  }
+  else return {
+    type: "not exist",
+    content: null,
+    metadata: null
+  }
   const matterResult = matter(fileContents);
   const metadata = matterResult.data;
+  const readTime = Math.ceil(matterResult.content.split(" ").length / 200) + "min";
+  metadata["readTime"] = readTime;
   let content;
 
   if (type === "md") {
     content = await remark()
+      .use(remarkParse)
       .use(remarkPrism)
-      .use(remarkHtml)
+      .use(remarkGfm)
+      .use(remarkMath)
+      .use(remarkRehype)
+      .use(rehypeKatex)
+      .use(rehypeStringify)
       .process(matterResult.content);
     content = content.toString();
   } else if (type == "mdx") {
@@ -113,8 +135,8 @@ export async function getPostData(id, type) {
       matterResult.content,
       {
         mdxOptions: {
-          remarkPlugins: [remarkPrism, remarkMath],
-          rehypePlugins: [rehypeKatex]
+          remarkPlugins: [remarkPrism, remarkMath, remarkParse, remarkGfm, remarkRehype],
+          rehypePlugins: [rehypeKatex, rehypeStringify]
         }
       });
   }

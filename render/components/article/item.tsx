@@ -12,13 +12,13 @@ export default function Item({ article }) {
                     </div>
                     <div className="article-text">
                         <p className="text-sm text-slate-500">
-                            {article.outline}
+                            {article.summary}
                         </p>
                         <div className="text-sm text-slate-500 mt-2">
                             <span className="me-1">{article.date}</span>
-                            <span className="me-1">{"·"}</span>
-                            <span className="me-1">{article.read_time}</span>
-                            <span className="me-1">{"·"}</span>
+                            <span className="me-1">{" · "}</span>
+                            <span className="me-1">{article.readTime}</span>
+                            <span className="me-1">{" · "}</span>
                             <span>{article.author}</span>
                         </div>
                     </div>

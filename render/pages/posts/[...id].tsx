@@ -8,6 +8,13 @@ const defaultComponents = { Test: dynamic(() => import("../../components/blog/te
 export default function Post({ article }) {
     let metadata = article.metadata;
     let type = article.type;
+    let content = article.content;
+    if (metadata === null || content === null)
+        return (
+            <div className="prose">
+                Sadly, Nothing here~
+            </div>
+        )
     return (
         <>
             <Head>
@@ -23,11 +30,6 @@ export default function Post({ article }) {
                 <meta property="og:description" content={metadata.description} />
                 <meta property="og:title" content={metadata.title} />
                 <meta property="og:image" content={metadata.cardImage} />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@vercel" />
-                <meta name="twitter:title" content={metadata.title} />
-                <meta name="twitter:description" content={metadata.description} />
-                <meta name="twitter:image" content={metadata.cardImage} />
                 <link
                     href={`https://unpkg.com/prismjs@latest/themes/prism-okaidia.css`}
                     rel="stylesheet"
@@ -44,16 +46,16 @@ export default function Post({ article }) {
                             <div className="article-text">
                                 <div className="text-sm text-slate-500 mt-2">
                                     <span className="me-1">{metadata.date}</span>
-                                    <span className="me-1">{"·"}</span>
-                                    <span className="me-1">{"4min"}</span>
-                                    <span className="me-1">{"·"}</span>
+                                    <span className="me-1">{" · "}</span>
+                                    <span className="me-1">{metadata.readTime}</span>
+                                    <span className="me-1">{" · "}</span>
                                     <span>{metadata.author}</span>
                                 </div>
                             </div>
                         </div>
                         {
-                            (type === "mdx") ?
-                                <MDXRemote {...article.content} components={defaultComponents}></MDXRemote>
+                            (type === "mdx")
+                                ? <MDXRemote {...article.content} components={defaultComponents}></MDXRemote>
                                 : <div dangerouslySetInnerHTML={{ __html: article.content }} />
                         }
                     </div>
@@ -72,7 +74,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-    const article = await getPostData(params.id, "md");
+    const article = await getPostData(params.id);
     return {
         props: {
             article
