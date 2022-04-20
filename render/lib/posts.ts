@@ -2,6 +2,9 @@ import fs from 'fs'
 import path from 'path'
 import { serialize } from 'next-mdx-remote/serialize'
 import prism from 'remark-prism'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
+
 const postsDirectory = path.join(process.cwd(), 'posts');
 
 export async function getSortedPostsData() {
@@ -79,7 +82,8 @@ export async function getPostData(id) {
     fileContents,
     {
       mdxOptions: {
-        remarkPlugins: [prism],
+        remarkPlugins: [prism, remarkMath],
+        rehypePlugins: [rehypeKatex]
       },
       parseFrontmatter: true
     });

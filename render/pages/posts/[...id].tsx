@@ -31,10 +31,11 @@ export default function Post({ article }) {
                     href={`https://unpkg.com/prismjs@latest/themes/prism-okaidia.css`}
                     rel="stylesheet"
                 />
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.0/dist/katex.min.css" />
             </Head>
             <div className="min-h-screen bg-white w-full h-full">
                 <div className="w-full pt-40 pl-10 pr-10 flex flex-col justify-center items-center">
-                    <div className="article w-full bg-white prose prose-neutral pt-10 pb-10">
+                    <div className="article md:w-1/2 w-full max-w-fit bg-white prose prose-neutral pt-10 pb-10">
                         <div className="header">
                             <div className="article-title text-3xl font-bold">
                                 {metadata.title}
