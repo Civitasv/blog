@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import Item from "./item";
+import Item from "../item";
 
 export default function Search() {
     const onSearchClick = useCallback((e) => {
@@ -11,11 +11,10 @@ export default function Search() {
     const onSearchContentChange = useCallback((e) => {
         //? when content change, refresh search
         const value = e.target.value;
-        fetch(`/api/search?q=${value}`).then(res => {
+        fetch(`/api/content/search?q=${value}`).then(res => {
             return res.json();
         }).then(res => {
             setSearchResult(res.results);
-            res.results.forEach(e => console.log(e))
         }).catch(err => {
             setSearchResult([]);
         });

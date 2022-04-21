@@ -3,14 +3,14 @@ import matter from 'gray-matter';
 import path from 'path';
 
 export default function handler(req, res) {
-  const results = req.query.q ? searchAllPostContent(req.query.q) : [];
+  const results = req.query.tag ? searchAllPostContentIncludeTag(req.query.tag) : [];
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({ results }));
 }
 
 
-function searchAllPostContent(keywords: string) {
+function searchAllPostContentIncludeTag(tag: string) {
   function helper(res, current: string, directory) {
     fs.readdirSync(directory).forEach(async file => {
       const absolute = path.join(directory, file);
@@ -32,8 +32,9 @@ function searchAllPostContent(keywords: string) {
         const analysis = matter(fileContents);
         const metadata = analysis.data;
         let contains = false;
-        for (const item of Object.keys(metadata)) {
-          if (metadata[item].includes(keywords)) {
+        const tags = metadata.tags;
+        for (const item of tags) {
+          if (item.includes(tag)) {
             contains = true;
             break;
           }
