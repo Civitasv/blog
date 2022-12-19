@@ -3,6 +3,7 @@ import { getSortedPostsData } from "../lib/posts";
 import Item from "../components/article/item";
 import Search from "../components/article/search/search";
 import Tag from "../components/article/search/tag";
+import Projects from "../components/article/projects_button/projects_button";
 
 export default function Home({ allPostsData }) {
   return (
@@ -15,7 +16,10 @@ export default function Home({ allPostsData }) {
 
       <header>
         <div className="flex flex-col justify-center items-center">
-          <div className="tools md:w-1/2 w-full mt-5 pr-6 pl-6 flex justify-end">
+          <div className="tools md:w-1/2 w-full mt-5 pr-6 flex justify-center">
+            <div className="flex-1">
+              <Projects></Projects>
+            </div>
             <div className="tag mr-3">
               <Tag></Tag>
             </div>

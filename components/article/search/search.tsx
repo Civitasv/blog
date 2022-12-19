@@ -4,12 +4,12 @@ import Item from "../item";
 
 export default function Search() {
   const onSearchClick = useCallback((e) => {
-    //? show dialog
+    //NOTE show dialog
     setShowDialog(true);
   }, []);
 
   const onSearchContentChange = useCallback((e) => {
-    //? when content change, refresh search
+    //NOTE when content change, refresh search
     const value = e.target.value;
     fetch(`/api/content/search?q=${value}`)
       .then((res) => {
